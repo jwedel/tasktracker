@@ -29,7 +29,7 @@ DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 
 type_map = {
 	"S" : "Start",
-	"D" : "Done"
+	"D" : ""
 }
 
 def start_day(journal, args):
@@ -59,7 +59,19 @@ def add_journal_entry(prefix, duration="", description=""):
 
 def list_tasks(journal, args):
 	for entry in journal:
-		print(" - ".join(["%6s" % (type_map[entry.type]), str(entry.date_time), entry.duration, entry.description] ))
+		print(entry_to_str(entry))
+
+def entry_to_str(entry):
+	type_str = "%6s" % (type_map[entry.type])
+
+	if entry.type == "S":
+		datetime_str = entry.date_time.strftime("%Y-%m-%d %H:%M:%S")
+		entry_str = "* %10s" % (datetime_str)
+	else:
+		datetime_str = entry.date_time.strftime("%H:%M:%S")
+		entry_str = "    " + " - ".join([datetime_str, entry.duration, entry.description ])
+
+	return entry_str
 
 def handle_command_line():
 	parser = argparse.ArgumentParser(description='Task tracker.')
