@@ -59,7 +59,7 @@ def add_journal_entry(prefix, duration="", description=""):
 
 def list_tasks(journal, args):
 	for entry in journal:
-		print("%6s - %s - %s - %s" % (type_map[entry.type], entry.date_time, entry.duration, entry.description) )
+		print(" - ".join(["%6s" % (type_map[entry.type]), str(entry.date_time), entry.duration, entry.description] ))
 
 def handle_command_line():
 	parser = argparse.ArgumentParser(description='Task tracker.')
