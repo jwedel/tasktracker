@@ -5,34 +5,44 @@
 
 
 import argparse
-from datetime import datetime
+import re
+import os.path
+
+from datetime import datetime, timedelta
 from enum import Enum
 from time import time
 
 class Commands(Enum):
 	start = 1
-	end = 2
-	done = 3
+	done = 2
 
 JOURNAL_FILE_NAME = "journal.txt"
+DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 
-
-def start_day(args):
+def start_day(journal, args):
 	print("Good morning!")
 	add_journal_entry("S")
 
-def add_journal_entry(prefix, description=""):	
+def task_done(journal, args):
+	print("Good job: " + args.task_description)
+
+	if len(journal) == 0 :
+		print("ERROR: You did not start a new day, unable to calculate the task duration.")
+	else:
+		current_datetime = datetime.now()
+		last_datetime = journal[-1][1]
+		diff = current_datetime - last_datetime
+		hours = int(diff / timedelta(hours=1))
+		minutes = int(diff / timedelta(minutes=1)) - (hours * 60)
+
+		duration_str =  "%02d:%02d" % (hours,minutes)
+
+		add_journal_entry("D", duration_str + " " + args.task_description)
+
+def add_journal_entry(prefix, description=""):
 	with open(JOURNAL_FILE_NAME, "a") as journal:
 		line = " ".join([prefix, datetime.now().isoformat(), description])
 		print(line, file=journal)
-
-def end_day(args):
-	print("Have good evening!")
-	add_journal_entry("E", args.task_description)
-
-def task_done(args):
-	print("Good job: " + args.task_description)
-	add_journal_entry("D", args.task_description)
 
 def handle_command_line():
 	parser = argparse.ArgumentParser(description='Task tracker.')
@@ -45,11 +55,36 @@ def handle_command_line():
 	parser_done = subparsers.add_parser(Commands.done.name, help='Ends the current running task')
 	parser_done.add_argument('task_description', type=str, help='A short description of the task that is done.')
 
-	# create the parser for the "b" command
-	parser_end = subparsers.add_parser(Commands.end.name, help='Ends the current day')
-	parser_end.add_argument('task_description', type=str, help='A short description of the task that is done.')
-
 	return parser.parse_args()
+
+def parse_journal(journal_lines):
+	
+	def split_line(line):
+		entry_fields = line.split(" ", 2)
+
+		if len(entry_fields) < 2:
+			raise Exception("Illegal journal entry found: " + line)
+
+		entry_type = entry_fields[0]
+
+		entry_date_time = datetime.strptime(entry_fields[1], DATE_FORMAT )
+
+		if len(entry_fields) > 2:
+			entry_description = entry_fields[2]
+		else:
+			entry_description = None
+
+		print(entry_type, entry_date_time, entry_description)
+
+		return (entry_type, entry_date_time, entry_description)
+
+	return [split_line(first) for first in journal_lines]
+
+def read_journal(file_name):
+	with open(file_name) as f:
+		journal_lines = f.readlines()
+
+	return journal_lines
 
 if __name__ == "__main__":
 	args = handle_command_line()
@@ -58,8 +93,14 @@ if __name__ == "__main__":
 
 	commands_functions = {
 		Commands.start.name : start_day,
-		Commands.end.name : end_day,
 		Commands.done.name : task_done
 	}
 
-	commands_functions[args.command](args)
+	if os.path.isfile(JOURNAL_FILE_NAME):
+		journal_lines = read_journal(JOURNAL_FILE_NAME)
+
+		journal = parse_journal(journal_lines)
+	else:
+		journal = []
+
+	commands_functions[args.command](journal, args)
