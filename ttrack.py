@@ -1,8 +1,4 @@
-# S 2015-07-01T09:00:00 
-# D 2015-07-01T09:10:00 Worked on Bursa
-# D 2015-07-01T09:10:00 Blue ant
-# E 2015-07-01T09:00:00
-
+# Task tracker
 
 import argparse
 import re
@@ -69,7 +65,7 @@ def entry_to_str(entry):
 		entry_str = "* %10s" % (datetime_str)
 	else:
 		datetime_str = entry.date_time.strftime("%H:%M:%S")
-		entry_str = "    " + " - ".join([datetime_str, entry.duration, entry.description ])
+		entry_str = (" "*13) + " - ".join([datetime_str, entry.duration, entry.description ])
 
 	return entry_str
 
