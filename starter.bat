@@ -1,6 +1,6 @@
 @echo off
 :loop 
-   set /p action=Insert action: 
+   set /p action="ttrack> "
    python ttrack.py %action%
    goto loop
    
