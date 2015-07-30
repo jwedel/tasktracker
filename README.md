@@ -1,6 +1,6 @@
 # tasktracker
 
-Command-line based tool to track work tasks.
+Command-line based tool to track work tasks. This is a helper tool for people who need to track work tasks for an employer or customer in a special inconvienient tool. `tasktracker` is easy to use and fast and you can use it to track your task easily across a week and then enter all work into that inconvenient tool.
 
 # Start on windows:
 
