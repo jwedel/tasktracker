@@ -4,9 +4,8 @@ import argparse
 import re
 import os.path
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time, date
 from enum import Enum
-from time import time
 
 class Commands(Enum):
 	start = 1
@@ -22,6 +21,7 @@ class Entry:
 
 JOURNAL_FILE_NAME = "journal.txt"
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
+TIME_REGEX = re.compile(r'(?P<hour>\d+?)?(:(?P<minute>\d+?))?(:(?P<second>\d+?))?')
 TIME_DIFF_REGEX = re.compile(r'((?P<hours>\d+?)hr)?((?P<minutes>\d+?)m)?((?P<seconds>\d+?)s)?')
 
 type_map = {
@@ -31,7 +31,11 @@ type_map = {
 
 def start_day(journal, args):
 	print("Good morning!")
-	add_journal_entry("S", datetime.now())
+	if not args.start_time:
+		start_time = datetime.now()
+	else:
+		start_time = parse_time(args.start_time)
+	add_journal_entry("S", start_time)
 
 def task_done(journal, args):
 	print("Good job: " + args.task_description)
@@ -74,8 +78,8 @@ def entry_to_str(entry):
 
 	return entry_str
 
-def parse_time_delta(time_str):
-	parts = TIME_DIFF_REGEX.match(time_str)
+def parse_time_delta(time_delta_str):
+	parts = TIME_DIFF_REGEX.match(time_delta_str)
 	if not parts:
 		return
 	parts = parts.groupdict()
@@ -83,7 +87,19 @@ def parse_time_delta(time_str):
 	for (name, param) in parts.items():
 		if param:
 			time_params[name] = int(param)
-	return timedelta(**time_params)	
+	return timedelta(**time_params)
+
+def parse_time(time_str):
+	parts = TIME_REGEX.match(time_str)
+	if not parts:
+		return
+	parts = parts.groupdict()
+	time_params = {}
+	for (name, param) in parts.items():
+		if param:
+			time_params[name] = int(param)
+	time_params["microsecond"] = 1
+	return datetime.combine(date.today(), time(**time_params))
 
 def handle_command_line():
 	parser = argparse.ArgumentParser(description='Task tracker.')
@@ -93,6 +109,7 @@ def handle_command_line():
 	subparsers.required = True
 
 	parser_start = subparsers.add_parser(Commands.start.name, help='Starts the current day')
+	parser_start.add_argument('start_time', type=str, metavar='HH[:MM[:SS]]', help='Allows to provide the start time for today.')
 
 	parser_done = subparsers.add_parser(Commands.done.name, help='Ends the current running task')
 	parser_done.add_argument('task_description', type=str, help='A short description of the task that is done.')
