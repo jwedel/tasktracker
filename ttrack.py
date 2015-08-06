@@ -109,7 +109,7 @@ def handle_command_line():
 	subparsers.required = True
 
 	parser_start = subparsers.add_parser(Commands.start.name, help='Starts the current day')
-	parser_start.add_argument('start_time', type=str, metavar='HH[:MM[:SS]]', help='Allows to provide the start time for today.')
+	parser_start.add_argument('start_time', nargs='?', type=str, metavar='HH[:MM[:SS]]', help='Allows to provide the start time for today.')
 
 	parser_done = subparsers.add_parser(Commands.done.name, help='Ends the current running task')
 	parser_done.add_argument('task_description', type=str, help='A short description of the task that is done.')
