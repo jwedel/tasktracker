@@ -21,7 +21,7 @@ class Entry:
 
 JOURNAL_FILE_NAME = "journal.txt"
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
-TIME_REGEX = re.compile(r'(?P<hour>\d+?)?(:(?P<minute>\d+?))?(:(?P<second>\d+?))?')
+TIME_REGEX = re.compile(r'(?P<hour>\d+)(:(?P<minute>\d+))?(:(?P<second>\d+))?')
 TIME_DIFF_REGEX = re.compile(r'((?P<hours>\d+?)hr)?((?P<minutes>\d+?)m)?((?P<seconds>\d+?)s)?')
 
 type_map = {
