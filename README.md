@@ -16,25 +16,27 @@ Python 3 must be installed and available on your system path. To check, open a W
 
 # Start on windows:
 
-Double click on starter.bat
+Double click on starter.bat (Thanks to cab)
 
 This opens a shell. 
 
 ## Get some help:
 
     ttrack> -h
-    usage: ttrack.py [-h] {start,done,list} ...
+
+    usage: ttrack.py [-h] {start,st,done,dn,list,ls} ...
 
     Task tracker.
-    
+
     positional arguments:
-      {start,done,list}  sub-commands help
-        start            Starts the current day
-        done             Ends the current running task
-        list             List all tasks
-    
+      {start,st,done,dn,list,ls}
+                            sub-commands help
+        start (st)          Starts the current day
+        done (dn)           Ends the current running task
+        list (ls)           List all tasks
+
     optional arguments:
-      -h, --help         show this help message and exit
+      -h, --help            show this help message and exit
 
 ## get gelp on a specific command (e.g. start):
 
@@ -75,3 +77,14 @@ List your journal:
     * 2015-07-30 09:00:42
                  10:30:42 - 01:30 - Sprint planning
                  11:00:42 - 00:30 - Lunch
+
+## Aliases
+
+There are short aliases for all command:
+
+|Command|Alias|
+|---|---|
+|start|st|
+|done|dn|
+|list|ls| 
+

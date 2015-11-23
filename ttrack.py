@@ -8,9 +8,15 @@ from datetime import datetime, timedelta, time, date
 from enum import Enum
 
 class Commands(Enum):
-	start = 1
-	done = 2
-	list = 3
+	start = (1, "st", "Starts the current day")
+	done = (2, "dn", "Ends the current running task")
+	list = (3, "ls", "List all tasks")
+
+	def get_alias(self):
+		return self.value[1]
+
+	def get_help(self):
+		return self.value[2]
 
 class Entry:
 	def __init__(self, type, date_time, duration, description):
@@ -108,16 +114,22 @@ def handle_command_line():
 	subparsers.dest = "command"
 	subparsers.required = True
 
-	parser_start = subparsers.add_parser(Commands.start.name, help='Starts the current day')
+	parser_start = add_command(subparsers, Commands.start)
+	#parser_start = subparsers.add_parser(Commands.start.name, help='Starts the current day', aliases=[Commands.start.get_alias()])
 	parser_start.add_argument('start_time', nargs='?', type=str, metavar='HH[:MM[:SS]]', help='Allows to provide the start time for today.')
 
-	parser_done = subparsers.add_parser(Commands.done.name, help='Ends the current running task')
+	parser_done = add_command(subparsers, Commands.done)
+	#parser_done = subparsers.add_parser(Commands.done.name, help='Ends the current running task', aliases=[Commands.done.get_alias()])
 	parser_done.add_argument('task_description', type=str, help='A short description of the task that is done.')
 	parser_done.add_argument('-d', type=str, dest='diff', metavar='HHhr[MMm[SSs]]', help='Allows to provide a timedelta in the form of HHhrMMmSSs. E.g. 1hr or 2hr5m43s')
 
-	parser_list = subparsers.add_parser(Commands.list.name, help='List all tasks')
+	parser_list = add_command(subparsers, Commands.list)
+	#parser_list = subparsers.add_parser(Commands.list.name, help='List all tasks', aliases=[Commands.list.get_alias()])
 
 	return parser.parse_args()
+
+def add_command(parser, command):
+	return parser.add_parser(command.name, help=command.get_help(), aliases=[command.get_alias()])
 
 def parse_journal(journal_lines):
 	
@@ -142,7 +154,10 @@ if __name__ == "__main__":
 	commands_functions = {
 		Commands.start.name : start_day,
 		Commands.done.name : task_done,
-		Commands.list.name : list_tasks
+		Commands.list.name : list_tasks,
+		Commands.start.get_alias() : start_day,
+		Commands.done.get_alias() : task_done,
+		Commands.list.get_alias() : list_tasks
 	}
 
 	if os.path.isfile(JOURNAL_FILE_NAME):
